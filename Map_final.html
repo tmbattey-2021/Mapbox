@@ -1,0 +1,110 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Address Map</title>
+
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.7.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.7.0/mapbox-gl.css' rel='stylesheet' />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <form id="login" align ="center">
+        <label for="Address">Address:</label>
+        <input type="text" name="Address" id="Address" style="width: 250px;">
+        <button type="button">Get Map</button><br />
+        <br />
+        <br />
+
+    </form>
+
+    
+
+    <!--used template for displaying a map from mapbox site
+    <!--https://docs.mapbox.com/mapbox-gl-js/guides/install/#quickstart-->
+
+
+    <div id='map' style='width: 700px; height: 500px'></div>
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoidG1iYXR0ZXkiLCJhIjoiY2t6Zno5aXVqM25iNDJwcDR4M2Qxc2E0bSJ9.oDkPCDETfm1G3dZAIuYvxA';
+        const map = new mapboxgl.Map({
+            container: 'map', // container ID
+            style: 'mapbox://styles/mapbox/streets-v11', // style URL
+            center: [-74.5, 40], // starting position [lng, lat] from mapbox example
+            zoom: 9 // starting zoom
+        });
+
+    </script>
+
+
+    <script>
+        $(document).ready(function () {
+
+            $("button").click(function () {
+                var FD = $('#Address').val();
+                //    console.log(FD);  :used to validate input
+
+                var queryString = encodeURIComponent(FD) + '.json';
+                var queryFinal = 'types=address' + '&access_token=pk.eyJ1IjoidG1iYXR0ZXkiLCJhIjoiY2t6Zno5aXVqM25iNDJwcDR4M2Qxc2E0bSJ9.oDkPCDETfm1G3dZAIuYvxA';
+
+                var jqxhr = $.getJSON("https://api.mapbox.com/geocoding/v5/mapbox.places/" + queryString, queryFinal, processResponse)
+
+
+                    .done(function () {
+                        alert("success");
+                    })
+
+                    .fail(function () {
+                        var errorMsg = "Your query couldn't be processed.  Please try again";
+                        console.log(errorMsg);
+                        alert("error");
+                    })
+
+
+
+                function errorResponse() {
+                    var errorMsg = "Your query couldn't be processed.  Please try again";
+                    console.log(errorMsg);
+                }
+
+                function processResponse(data) {
+
+
+
+                    // console.log(data); displays data retrieved from mapbox
+
+
+                    var messageContent = data.features[0];  //retrieve the most relevant result set
+
+                    var centervar = messageContent.center;
+
+                    //  console.log(messageContent);
+
+                    //   console.log(centervar); display new map coordinates
+
+                    longvar = centervar[0];
+                    // console.log(longvar);
+                    latvar = centervar[1];
+                    //   console.log(latvar);
+
+                    //recenter the map
+                    map.setCenter([longvar, latvar]);
+
+                    // Create a new marker.  Code template from mapbox site.
+                    const marker = new mapboxgl.Marker()
+                        .setLngLat([longvar, latvar])
+                        .addTo(map);
+
+
+                }
+                return false;
+
+            });  // click function
+        });  // end ready
+
+    </script>
+
+
+</body>
+</html>
